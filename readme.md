@@ -51,31 +51,31 @@ If you supply keywords in the second column of the CSV file, then when imported,
 
 * If you are using the '36' setting for `YOURLS_URL_CONVERT` (in `user/config.php`) then any UPPERCASE LETTERS in your supplied keyword will be *removed* from your keyword.  Not lowercased: removed. `ABCdef123` will become `def123`. `BBC` will become an empty string and will be treated as if you hadn't supplied a keyword.  If you use the '62' setting (which includes both cases), this won't happen, but remember that you shouldn't change this setting after installation.  Example CSV file:
 
-    http://bbc.co.uk/,bbcnews   -->     Will import as-is.
-    http://bbc.co.uk/,BBC       -->     UPPERCASE letters are stripped out (with '36' setting) and will import as if it had no keyword supplied. With the '62' setting, will import as-is.
-    http://bbc.co.uk/,BBCnews   -->     Will become `news` (with '36' setting) or will import as-is (with '62' setting).
+> `http://bbc.co.uk/,bbcnews`   -->     Will import as-is.
+> `http://bbc.co.uk/,BBC`       -->     UPPERCASE letters are stripped out (with '36' setting) and will import as if it had no keyword supplied. With the '62' setting, will import as-is.
+> `http://bbc.co.uk/,BBCnews`   -->     Will become `news` (with '36' setting) or will import as-is (with '62' setting).
 
 * You can get around the above by installing and activating the [Force Lowercase plugin](https://github.com/yourls/force-lowercase):
 
-    http://bbc.co.uk/,bbcnews   -->     Will import as-is.
-    http://bbc.co.uk/,BBC       -->     Will become 'bbc'.  (If not using the plugin, will import as-is.)
-    http://bbc.co.uk/,BBCnews   -->     Will become 'bbcnews' and therefore a duplicate, so will not be imported. (If not using the plugin, will import as-is.)
+> `http://bbc.co.uk/,bbcnews`   -->     Will import as-is.
+> `http://bbc.co.uk/,BBC`       -->     Will become 'bbc'.  (If not using the plugin, will import as-is.)
+> `http://bbc.co.uk/,BBCnews`   -->     Will become 'bbcnews' and therefore a duplicate, so will not be imported. (If not using the plugin, will import as-is.)
 
 * If you have `YOURLS_UNIQUE_URLS` set to 'true' (in `user/config.php`) which is the default, then multiple short URLs pointing to the same long URL (as in the previous examples, all using the same long URL) will not be allowed, and during import will be rejected.  Change the setting to 'false' to allow this:
 
-    http://bbc.co.uk/,bbc       -->     Will import fine.
-    http://bbc.co.uk/,news      -->     Will be rejected if `YOURLS_UNIQUE_URLS` is 'true', or allowed if 'false'.
+> `http://bbc.co.uk/,bbc`       -->     Will import fine.
+> `http://bbc.co.uk/,news`      -->     Will be rejected if `YOURLS_UNIQUE_URLS` is 'true', or allowed if 'false'.
 
 * If you want to use hyphens / dashes in your short URLs, you need to activate the 'Allow hyphens in short URLs' plugin which comes with YOURLS.
 
-    http://bbc.co.uk/,bbc-news  -->     Without the plugin activated, will become 'bbcnews'. With the plugin activated, will import as-is. 
+> `http://bbc.co.uk/,bbc-news`  -->     Without the plugin activated, will become 'bbcnews'. With the plugin activated, will import as-is. 
 
 I have talked through some common plugins and the outcomes of various situations, but please check carefully the short URLs of bulk-imported long URLs to ensure everything is as you expect.  Due to the way plugins can hook into YOURLS I cannot know what plugins are installed and how they may affect how a short URL is created.
 
 
 ## License
 
-Uses YOURLS' license, aka *"Do whatever the hell you want with it"*.  I borrowed code from others which had no licence so I can't claim this whole plugin as my own work, but the lion's share of it is.
+Uses YOURLS' license, aka *"Do whatever the hell you want with it"*.  I borrowed some code from others (including [GautamGupta](https://github.com/gautamgupta/yourls-Import-Export) who in turn borrowed from [John Godley](http://urbangiraffe.com/plugins/redirection/)) whose code had no licence so I can't claim this whole plugin as my own work, but the lion's share of it is.
 
 
 ## Bugs and Features
