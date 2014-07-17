@@ -35,6 +35,8 @@ This plugin has no user-configurable options.  If you know what you're doing you
 
 This plugin expects you to upload a CSV file with at least one column and an optional second column.  The first column should contain the long URL of the 'target', e.g. http://bbc.co.uk. The optional second column can contain a keyword you would like to associate with this URL, if you don't want YOURLS to generate one for you.
 
+Note: In this repository is a file called `test.csv`, which you can use as an example. 
+
 
 ### No keywords
 
