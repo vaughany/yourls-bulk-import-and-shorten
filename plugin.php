@@ -83,6 +83,12 @@ function vaughany_bias_import_urls( $file ) {
         yourls_add_notice('Not an uploaded file.');
     }
 
+    // Only handle .csv files.
+    if ($file['type'] !== 'text/csv') {
+        yourls_add_notice('Not a .csv file.');
+        return 0;
+    }
+
     global $ydb;
 
     ini_set( 'auto_detect_line_endings', true );
