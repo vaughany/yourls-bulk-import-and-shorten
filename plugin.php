@@ -4,16 +4,11 @@
 Plugin Name:    Bulk Import and Shorten
 Plugin URI:     https://github.com/vaughany/yourls-bulk-import-and-shorten
 Description:    A YOURLS plugin allowing importing of URLs in bulk to be shortened or (optionally) with a custom short URL.
-Version:        0.1
-Release date:   2014-07-17
+Version:        0.2
+Release date:   2020-07-25
 Author:         Paul Vaughan
 Author URI:     http://github.com/vaughany/
 */
-
-/**
- * TODO:
- *      Write the plugin!
- */
 
 /**
  * https://github.com/YOURLS/YOURLS/wiki/Coding-Standards
@@ -36,20 +31,20 @@ function vaughany_bias_add_page() {
 }
 
 function vaughany_bias_display_page() {
-    echo '<h2>Bulk Import and Shorten</h2>' . "\n";
-    echo '<p>Import links as long URLs and let YOURLS shorten them for you according to your settings.</p>' . "\n";
-    echo '<p>Upload a .csv file in the following format:</p>' . "\n";
-    echo '<ul><li>First column - required: a long URL</li><li>Second column - optional: a short URL of your choosing (otherwise one will be created by YOURLS according to your settings)</li></ul>' . "\n";
-    echo '<p>I don\'t know what will happen if two short links point to the same long link - this might or might not be allowed, according to your settings.</p>' . "\n";
-    //echo '<p></p>' . "\n";
+    echo '<h2>Bulk Import and Shorten</h2>' . PHP_EOL;
+    echo '<p>Import links as long URLs and let YOURLS shorten them for you according to your settings.</p>' . PHP_EOL;
+    echo '<p>Upload a .csv file in the following format:</p>' . PHP_EOL;
+    echo '<ul><li>First column - required: a long URL</li><li>Second column - optional: a short URL of your choosing (otherwise one will be created by YOURLS according to your settings)</li></ul>' . PHP_EOL;
+    echo '<p>I don\'t know what will happen if two short links point to the same long link - this might or might not be allowed, according to your settings.</p>' . PHP_EOL;
+    //echo '<p></p>' . PHP_EOL;
 
-    echo '<h3>Import</h3>' . "\n";
-    echo '<form action="' . yourls_remove_query_arg( array( 'import', 'export', 'nonce', 'action' ) ) . '" method="post" accept-charset="utf-8" enctype="multipart/form-data">' . "\n";
-    //echo '<form action="" method="post" accept-charset="utf-8" enctype="multipart/form-data">' . "\n";
+    echo '<h3>Import</h3>' . PHP_EOL;
+    echo '<form action="' . yourls_remove_query_arg( array( 'import', 'export', 'nonce', 'action' ) ) . '" method="post" accept-charset="utf-8" enctype="multipart/form-data">' . PHP_EOL;
+    //echo '<form action="" method="post" accept-charset="utf-8" enctype="multipart/form-data">' . PHP_EOL;
     echo yourls_nonce_field( 'vaughany_bias_import', 'nonce', false, false );
-    echo '<input type="file" name="import" value="">' . "\n";
-    echo '<input type="submit" name="import" value="Upload">' . "\n";
-    echo '</form>' . "\n";
+    echo '<input type="file" name="import" value="">' . PHP_EOL;
+    echo '<input type="submit" name="import" value="Upload">' . PHP_EOL;
+    echo '</form>' . PHP_EOL;
 
 }
 
@@ -97,21 +92,29 @@ function vaughany_bias_import_urls( $file ) {
         // Get each line in turn as an array, comma-separated.
         while ( $csv = fgetcsv( $fh, 1000, ',' ) ) {
 
+            $url = $keyword = $title = '';
+
+            $url = trim( $csv[0] );
+
             // Trim out cruft and slashes.
-            $keyword = trim( str_replace( '/', '', $csv[1] ) );
+            $new_keyword = trim( str_replace( '/', '', $csv[1] ) );
 
             // If the requested keyword is not free, use nothing.
-            if ( !yourls_keyword_is_free( $keyword ) ) {
-                $keyword = '';
+            if ( yourls_keyword_is_free( $new_keyword ) ) {
+                $keyword = $new_keyword;
             }
 
+            // New in v0.2: Creating a title from the URL, so one is not fetched from the URL, slowing down the import.
+            $title = trim( str_replace(['http://', 'https://', '/'], '', $csv[0]) );
+
             // Add a new link (passing the keyword) and get the result.
-            $result = yourls_add_new_link( trim( $csv[0] ), $keyword );
+            $result = yourls_add_new_link( $url, $keyword, $title );
 
             if ( $result['status'] == 'success' ) {
                 $count++;
             }
         }
+
     } else {
         yourls_add_notice('File handle is bad.');
     }

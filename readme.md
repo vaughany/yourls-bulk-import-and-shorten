@@ -4,8 +4,8 @@ Plugin for [YOURLS](http://yourls.org) 1.7.x.
 
 * Plugin URI:       [github.com/vaughany/yourls-bulk-import-and-shorten](https://github.com/vaughany/yourls-bulk-import-and-shorten)
 * Description:      A YOURLS plugin allowing importing of URLs in bulk to be shortened or (optionally) with a custom short URL.
-* Version:          0.1
-* Release date:     2014-07-17
+* Version:          0.2
+* Release date:     2020-07-25
 * Author:           Paul Vaughan
 * Author URI:       [github.com/vaughany](http://github.com/vaughany/)
 
@@ -35,7 +35,7 @@ This plugin has no user-configurable options.  If you know what you're doing you
 
 This plugin expects you to upload a CSV file with at least one column and an optional second column.  The first column should contain the long URL of the 'target', e.g. http://bbc.co.uk. The optional second column can contain a keyword you would like to associate with this URL, if you don't want YOURLS to generate one for you.
 
-Note: In this repository is a file called `test.csv`, which you can use as an example. 
+Note: In this repository is a file called `test.csv`, which you can use as an example.
 
 
 ### No keywords
@@ -75,9 +75,19 @@ If you supply keywords in the second column of the CSV file, then when imported,
 
 * If you want to use hyphens / dashes in your short URLs, you need to activate the 'Allow hyphens in short URLs' plugin which comes with YOURLS.
 
-> `http://bbc.co.uk/,bbc-news`  -->     Without the plugin activated, will become 'bbcnews'. With the plugin activated, will import as-is. 
+> `http://bbc.co.uk/,bbc-news`  -->     Without the plugin activated, will become 'bbcnews'. With the plugin activated, will import as-is.
 
 I have talked through some common plugins and the outcomes of various situations, but please check carefully the short URLs of bulk-imported long URLs to ensure everything is as you expect.  Due to the way plugins can hook into YOURLS I cannot know what plugins are installed and how they may affect how a short URL is created.
+
+
+## Troubleshooting
+
+One user experienced timeout issues processing a CSV file containing ~60,000 rows. I've not investigated this issue thoroughly, but the 0.2 version contains a line that creates a title from the supplied URL instead of letting YOURLS CURLing the URL and extracting a title from the returned HTML.  I believe this to be faster, but I have only done a little testing.
+
+Some ideas, if processing a large CSV file:
+
+* Change the `max_execution_time` setting in your `php.ini` file from it's default of 30 seconds.
+* Change the `max_input_time` setting in your `php.ini` file from it's default of 60 seconds.
 
 
 ## License
@@ -96,6 +106,7 @@ I'm always keen to add new features, improve performance and squash bugs, so if 
 
 ## History
 
+* 2020-07-25, v0.2:     From a bug report via email about it running slowly processing thousands of rows, I've attempted a 'fix' by creating a title from the URL and passing that to the YOURLS function that would otherwise attempt to fetch one from the URL's HTML.
 * 2014-07-17, v0.1:     Still a work in progress.
 
 ## Finally...
