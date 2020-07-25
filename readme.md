@@ -4,8 +4,8 @@ Plugin for [YOURLS](http://yourls.org) 1.7.x.
 
 * Plugin URI:       [github.com/vaughany/yourls-bulk-import-and-shorten](https://github.com/vaughany/yourls-bulk-import-and-shorten)
 * Description:      A YOURLS plugin allowing importing of URLs in bulk to be shortened or (optionally) with a custom short URL.
-* Version:          0.1
-* Release date:     2014-07-17
+* Version:          0.2
+* Release date:     2020-07-25
 * Author:           Paul Vaughan
 * Author URI:       [github.com/vaughany](http://github.com/vaughany/)
 
