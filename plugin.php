@@ -4,7 +4,7 @@
 Plugin Name:    Bulk Import and Shorten
 Plugin URI:     https://github.com/vaughany/yourls-bulk-import-and-shorten
 Description:    A YOURLS plugin allowing importing of URLs in bulk to be shortened or (optionally) with a custom short URL.
-Version:        0.2
+Version:        0.3
 Release date:   2020-07-25
 Author:         Paul Vaughan
 Author URI:     http://github.com/vaughany/
@@ -31,21 +31,25 @@ function vaughany_bias_add_page() {
 }
 
 function vaughany_bias_display_page() {
-    echo '<h2>Bulk Import and Shorten</h2>' . PHP_EOL;
-    echo '<p>Import links as long URLs and let YOURLS shorten them for you according to your settings.</p>' . PHP_EOL;
-    echo '<p>Upload a .csv file in the following format:</p>' . PHP_EOL;
-    echo '<ul><li>First column - required: a long URL</li><li>Second column - optional: a short URL of your choosing (otherwise one will be created by YOURLS according to your settings)</li></ul>' . PHP_EOL;
-    echo '<p>I don\'t know what will happen if two short links point to the same long link - this might or might not be allowed, according to your settings.</p>' . PHP_EOL;
-    //echo '<p></p>' . PHP_EOL;
+    echo <<<EOT
+<h2>Bulk Import and Shorten</h2>
+<p>Import links as long URLs and let YOURLS shorten them for you according to your settings.</p>
+<p>Upload a .csv file in the following format:</p>
+<ul>
+  <li>First column - required: a long URL</li>
+  <li>Second column - optional: a short URL of your choosing (otherwise one will be created by YOURLS according to your settings)</li>
+  <li>Third column - optional: a title of your choosing.</li>
+</ul>
+<p>I don't know what will happen if two short links point to the same long link - this might or might not be allowed, according to your settings.</p>
 
-    echo '<h3>Import</h3>' . PHP_EOL;
+<h3>Import</h3>
+EOT;
+
     echo '<form action="' . yourls_remove_query_arg( array( 'import', 'export', 'nonce', 'action' ) ) . '" method="post" accept-charset="utf-8" enctype="multipart/form-data">' . PHP_EOL;
-    //echo '<form action="" method="post" accept-charset="utf-8" enctype="multipart/form-data">' . PHP_EOL;
-    echo yourls_nonce_field( 'vaughany_bias_import', 'nonce', false, false );
-    echo '<input type="file" name="import" value="">' . PHP_EOL;
-    echo '<input type="submit" name="import" value="Upload">' . PHP_EOL;
+    echo '  ' . yourls_nonce_field( 'vaughany_bias_import', 'nonce', false, false );
+    echo '  <input type="file" name="import" value="">' . PHP_EOL;
+    echo '  <input type="submit" name="import" value="Upload">' . PHP_EOL;
     echo '</form>' . PHP_EOL;
-
 }
 
 function vaughany_bias_handle_post() {
@@ -104,8 +108,15 @@ function vaughany_bias_import_urls( $file ) {
                 $keyword = $new_keyword;
             }
 
-            // New in v0.2: Creating a title from the URL, so one is not fetched from the URL, slowing down the import.
-            $title = trim( str_replace(['http://', 'https://', '/'], '', $csv[0]) );
+            if ( isset( $csv[2] ) ) {
+                if ( !empty ( $csv[2] ) ) {
+                    $title = trim( $csv[2] );
+                } else {
+                    $title = vaughany_bias_create_title_from_url( $url );
+                }
+            } else {
+                $title = vaughany_bias_create_title_from_url( $url );
+            }
 
             // Add a new link (passing the keyword) and get the result.
             $result = yourls_add_new_link( $url, $keyword, $title );
@@ -120,4 +131,14 @@ function vaughany_bias_import_urls( $file ) {
     }
 
     return $count;
+}
+
+/**
+ * Create a title from the URL
+ *
+ * @param string $url   New in v0.2: Creating a title from the URL, so one is not fetched from the URL, slowing down the import.
+ * @return string
+ */
+function vaughany_bias_create_title_from_url( string $url ) : string {
+    return yourls_sanitize_title( str_replace(['http://', 'https://', '/'], '', $url) );
 }

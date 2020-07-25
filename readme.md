@@ -4,7 +4,7 @@ Plugin for [YOURLS](http://yourls.org) 1.7.x.
 
 * Plugin URI:       [github.com/vaughany/yourls-bulk-import-and-shorten](https://github.com/vaughany/yourls-bulk-import-and-shorten)
 * Description:      A YOURLS plugin allowing importing of URLs in bulk to be shortened or (optionally) with a custom short URL.
-* Version:          0.2
+* Version:          0.3
 * Release date:     2020-07-25
 * Author:           Paul Vaughan
 * Author URI:       [github.com/vaughany](http://github.com/vaughany/)
@@ -33,7 +33,7 @@ This plugin has no user-configurable options.  If you know what you're doing you
 
 ## Use
 
-This plugin expects you to upload a CSV file with at least one column and an optional second column.  The first column should contain the long URL of the 'target', e.g. http://bbc.co.uk. The optional second column can contain a keyword you would like to associate with this URL, if you don't want YOURLS to generate one for you.
+This plugin expects you to upload a CSV file with at least one column and optional second and third columns.  The first column should contain the long URL of the 'target', e.g. http://bbc.co.uk. The optional second column can contain a keyword you would like to associate with this URL, if you don't want YOURLS to generate one for you.  The third column contains an optional title. If one is not supplied, YOURLS generates one for you.
 
 Note: In this repository is a file called `test.csv`, which you can use as an example.
 
@@ -80,14 +80,23 @@ If you supply keywords in the second column of the CSV file, then when imported,
 I have talked through some common plugins and the outcomes of various situations, but please check carefully the short URLs of bulk-imported long URLs to ensure everything is as you expect.  Due to the way plugins can hook into YOURLS I cannot know what plugins are installed and how they may affect how a short URL is created.
 
 
+### Titles
+
+Normally, YOURLS will try to get a title for you by downloading the web page from the supplied URL and checking the raw HTML for a title.  This is possibly the reason for slow bulk importing, when extremely large CSV files are uploaded.  This plugin prevents YOURLS from doing it's job and instead creates a title from the supplied URL, or uses the one in the third column of the CSV, if present and non-empty.
+
+
 ## Troubleshooting
 
 One user experienced timeout issues processing a CSV file containing ~60,000 rows. I've not investigated this issue thoroughly, but the 0.2 version contains a line that creates a title from the supplied URL instead of letting YOURLS CURLing the URL and extracting a title from the returned HTML.  I believe this to be faster, but I have only done a little testing.
 
 Some ideas, if processing a large CSV file:
 
-* Change the `max_execution_time` setting in your `php.ini` file from it's default of 30 seconds.
-* Change the `max_input_time` setting in your `php.ini` file from it's default of 60 seconds.
+* Increase the `max_execution_time` setting in your `php.ini` file from it's default of 30 seconds.
+* Increase the `max_input_time` setting in your `php.ini` file from it's default of 60 seconds.
+
+**Note:** Setting either of these to 300 / 600 / 900 seconds (5 / 10 / 15 minutes) is not unreasonable.
+
+I've not investigated memory issues at this point, however I'd like to hear back if you have any experience of these (or any issues, for that matter).
 
 
 ## License
@@ -104,8 +113,15 @@ I'm always keen to add new features, improve performance and squash bugs, so if 
 * What actually happened
 * Steps to reproduce
 
+
+## To-Do
+
+* Make the forcing of titles to either generated from the URL or specified in the CSV file optional, so that YOURLS can try to pull one from the URL's website's HTML (which is probably the preferred option, but slow when doing huge imports).
+
+
 ## History
 
+* 2020-07-25, v0.2:     Going through the issues on GitHub and saw #3 which looked like an easy addition, so now if a third, optional field is specified in the URL, that is used as a title.
 * 2020-07-25, v0.2:     From a bug report via email about it running slowly processing thousands of rows, I've attempted a 'fix' by creating a title from the URL and passing that to the YOURLS function that would otherwise attempt to fetch one from the URL's HTML.
 * 2014-07-17, v0.1:     Still a work in progress.
 
