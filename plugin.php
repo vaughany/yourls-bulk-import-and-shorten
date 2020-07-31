@@ -106,12 +106,14 @@ function vaughany_bias_import_urls( $file ) {
 
             $url = trim( $csv[0] );
 
-            // Trim out cruft and slashes.
-            $new_keyword = trim( str_replace( '/', '', $csv[1] ) );
+            if ( isset( $csv[1] ) && !empty( $csv[1] ) ) {
+                // Trim out cruft and slashes.
+                $new_keyword = trim( str_replace( '/', '', $csv[1] ) );
 
-            // If the requested keyword is not free, use nothing.
-            if ( yourls_keyword_is_free( $new_keyword ) ) {
-                $keyword = $new_keyword;
+                // If the requested keyword is not free, use nothing.
+                if ( yourls_keyword_is_free( $new_keyword ) ) {
+                    $keyword = $new_keyword;
+                }
             }
 
             if ( isset( $csv[2] ) ) {

@@ -121,7 +121,7 @@ I'm always keen to add new features, improve performance and squash bugs, so if 
 
 ## History
 
-* 2020-07-25, v0.2:     Going through the issues on GitHub and saw #3 which looked like an easy addition, so now if a third, optional field is specified in the URL, that is used as a title.
+* 2020-07-25, v0.3:     Going through the issues on GitHub and saw #3 which looked like an easy addition, so now if a third, optional field is specified in the URL, that is used as a title.
 * 2020-07-25, v0.2:     From a bug report via email about it running slowly processing thousands of rows, I've attempted a 'fix' by creating a title from the URL and passing that to the YOURLS function that would otherwise attempt to fetch one from the URL's HTML.
 * 2014-07-17, v0.1:     Still a work in progress.
 
