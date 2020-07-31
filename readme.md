@@ -4,8 +4,8 @@ Plugin for [YOURLS](http://yourls.org) 1.7.x.
 
 * Plugin URI:       [github.com/vaughany/yourls-bulk-import-and-shorten](https://github.com/vaughany/yourls-bulk-import-and-shorten)
 * Description:      A YOURLS plugin allowing importing of URLs in bulk to be shortened or (optionally) with a custom short URL.
-* Version:          0.3
-* Release date:     2020-07-25
+* Version:          0.4
+* Release date:     2020-07-31
 * Author:           Paul Vaughan
 * Author URI:       [github.com/vaughany](http://github.com/vaughany/)
 
@@ -116,14 +116,15 @@ I'm always keen to add new features, improve performance and squash bugs, so if 
 
 ## To-Do
 
-* Make the forcing of titles to either generated from the URL or specified in the CSV file optional, so that YOURLS can try to pull one from the URL's website's HTML (which is probably the preferred option, but slow when doing huge imports).
+* Make theforcing of titles to either generated from the URL or specified in the CSV file optional, so that YOURLS can try to pull one from the URL's website's HTML (which is probably the preferred option, but slow when doing huge imports).
 
 
 ## History
 
-* 2020-07-25, v0.3:     Going through the issues on GitHub and saw #3 which looked like an easy addition, so now if a third, optional field is specified in the URL, that is used as a title.
-* 2020-07-25, v0.2:     From a bug report via email about it running slowly processing thousands of rows, I've attempted a 'fix' by creating a title from the URL and passing that to the YOURLS function that would otherwise attempt to fetch one from the URL's HTML.
-* 2014-07-17, v0.1:     Still a work in progress.
+* **2020-07-31, v0.4:**     No meaningful code changes, but added a small Bash (Linux) script to make a large single-column CSV file for testing. You should be able to run it within Bash with `./create-large-csv.sh`. You might have to `chmod +x create-large-csv.sh` first.
+* **2020-07-25, v0.3:**     Going through the issues on GitHub and saw #3 which looked like an easy addition, so now if a third, optional field is specified in the URL, that is used as a title.
+* **2020-07-25, v0.2:**     From a bug report via email about it running slowly processing thousands of rows, I've attempted a 'fix' by creating a title from the URL and passing that to the YOURLS function that would otherwise attempt to fetch one from the URL's HTML.
+* **2014-07-17, v0.1:**     Still a work in progress.
 
 ## Finally...
 

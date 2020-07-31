@@ -4,8 +4,8 @@
 Plugin Name:    Bulk Import and Shorten
 Plugin URI:     https://github.com/vaughany/yourls-bulk-import-and-shorten
 Description:    A YOURLS plugin allowing importing of URLs in bulk to be shortened or (optionally) with a custom short URL.
-Version:        0.3
-Release date:   2020-07-25
+Version:        0.4
+Release date:   2020-07-31
 Author:         Paul Vaughan
 Author URI:     http://github.com/vaughany/
 */
