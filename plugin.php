@@ -108,14 +108,31 @@ function vaughany_bias_display_problems( array $problems ): void {
 function vaughany_bias_handle_post(): void {
     global $vaughany_bias_report;
 
+    $d = VAUGHANY_BIAS_DOMAIN;
+
+    // PHP silently drops uploads when they are disabled, so warn before the user even picks a file.
+    if ( !filter_var( ini_get( 'file_uploads' ), FILTER_VALIDATE_BOOLEAN ) ) {
+        yourls_add_notice( yourls__( 'File uploads are disabled on this server (file_uploads is off in the PHP settings), so no file can be imported. Ask your administrator or host to enable file uploads.', $d ), 'error' );
+        return;
+    }
+
+    if ( ( $_SERVER['REQUEST_METHOD'] ?? '' ) !== 'POST' ) {
+        return;
+    }
+
     if ( empty( $_FILES['import'] ) ) {
+        // If $_POST is empty too, PHP dropped the whole request because it was larger than post_max_size.
+        if ( empty( $_POST ) && (int) ( $_SERVER['CONTENT_LENGTH'] ?? 0 ) > 0 ) {
+            yourls_add_notice( sprintf( yourls__( 'No file received: the upload is larger than the server allows (post_max_size is %s). Upload a smaller file, or increase the limit in the PHP settings.', $d ), ini_get( 'post_max_size' ) ), 'error' );
+        } else {
+            yourls_add_notice( yourls__( 'No file received. Please select a .csv file and try again.', $d ), 'error' );
+        }
         return;
     }
 
     // Dies with a 403 if the nonce is missing or invalid.
     yourls_verify_nonce( 'vaughany_bias_import' );
 
-    $d      = VAUGHANY_BIAS_DOMAIN;
     $report = vaughany_bias_import_urls( $_FILES['import'] );
 
     if ( $report === null ) {
@@ -145,7 +162,14 @@ function vaughany_bias_handle_post(): void {
 function vaughany_bias_import_urls( array $file ): ?array {
     $d = VAUGHANY_BIAS_DOMAIN;
 
-    if ( ( $file['error'] ?? UPLOAD_ERR_NO_FILE ) !== UPLOAD_ERR_OK || !is_uploaded_file( $file['tmp_name'] ) ) {
+    // Check the upload error code first: when an upload fails, tmp_name is empty and is_uploaded_file() can't say why.
+    $error = is_int( $file['error'] ?? null ) ? $file['error'] : UPLOAD_ERR_NO_FILE;
+    if ( $error !== UPLOAD_ERR_OK ) {
+        yourls_add_notice( vaughany_bias_upload_error_message( $error ), 'error' );
+        return null;
+    }
+
+    if ( !is_string( $file['tmp_name'] ?? null ) || !is_uploaded_file( $file['tmp_name'] ) ) {
         yourls_add_notice( yourls__( 'The file did not upload correctly.', $d ), 'error' );
         return null;
     }
@@ -249,6 +273,27 @@ function vaughany_bias_import_urls( array $file ): ?array {
     yourls_remove_filter( 'shunt_check_IP_flood', 'vaughany_bias_skip_flood_check' );
 
     return $report;
+}
+
+/**
+ * Explain a PHP upload error.
+ *
+ * @param int $error One of the UPLOAD_ERR_* constants.
+ * @return string
+ */
+function vaughany_bias_upload_error_message( int $error ): string {
+    $d = VAUGHANY_BIAS_DOMAIN;
+
+    return match ( $error ) {
+        UPLOAD_ERR_INI_SIZE   => sprintf( yourls__( 'The file is larger than the server allows (upload_max_filesize is %s).', $d ), ini_get( 'upload_max_filesize' ) ),
+        UPLOAD_ERR_FORM_SIZE  => yourls__( 'The file is larger than the upload form allows.', $d ),
+        UPLOAD_ERR_PARTIAL    => yourls__( 'The file was only partially uploaded. Please try again.', $d ),
+        UPLOAD_ERR_NO_FILE    => yourls__( 'Please select a .csv file first.', $d ),
+        UPLOAD_ERR_NO_TMP_DIR => yourls__( 'The server has no temporary folder for uploads. Contact your administrator.', $d ),
+        UPLOAD_ERR_CANT_WRITE => yourls__( 'The server could not save the uploaded file. Contact your administrator.', $d ),
+        UPLOAD_ERR_EXTENSION  => yourls__( 'A PHP extension stopped the upload. Contact your administrator.', $d ),
+        default               => sprintf( yourls__( 'The upload failed (error code %d).', $d ), $error ),
+    };
 }
 
 /**
