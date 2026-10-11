@@ -1,13 +1,13 @@
 # Bulk Import and Shorten - a YOURLS plugin
 
-Plugin for [YOURLS](http://yourls.org) 1.7.x.
+Plugin for [YOURLS](https://yourls.org) 1.10.x (tested with 1.10.6). Requires PHP 8.1 or later, as YOURLS does.
 
 * Plugin URI:       [github.com/vaughany/yourls-bulk-import-and-shorten](https://github.com/vaughany/yourls-bulk-import-and-shorten)
 * Description:      A YOURLS plugin allowing importing of URLs in bulk to be shortened or (optionally) with a custom short URL.
-* Version:          0.4
-* Release date:     2020-07-31
+* Version:          0.5
+* Release date:     2026-10-11
 * Author:           Paul Vaughan
-* Author URI:       [github.com/vaughany](http://github.com/vaughany/)
+* Author URI:       [github.com/vaughany](https://github.com/vaughany/)
 
 
 ## Description
@@ -21,7 +21,7 @@ Note: CSV (comma-separated value) files are plain text files with columns separa
 
 1. In `/user/plugins`, create a new folder named `bulk-import-and-shorten`.
 2. Drop these files in that directory.
-3. Go to the Manage Plugins page (e.g. `http://sho.rt/admin/plugins.php`) and activate the plugin.
+3. Go to the Manage Plugins page (e.g. `https://sho.rt/admin/plugins.php`) and activate the plugin.
 4. Under the Manage Plugins link should be a new link called `Bulk Import and Shorten`.
 5. Have fun!
 
@@ -35,7 +35,11 @@ This plugin has no user-configurable options.  If you know what you're doing you
 
 This plugin expects you to upload a CSV file with at least one column and optional second and third columns.  The first column should contain the long URL of the 'target', e.g. http://bbc.co.uk. The optional second column can contain a keyword you would like to associate with this URL, if you don't want YOURLS to generate one for you.  The third column contains an optional title. If one is not supplied, YOURLS generates one for you.
 
-Note: In this repository is a file called `test.csv`, which you can use as an example.
+The file must have a `.csv` extension. Files saved by Excel, LibreOffice, Google Sheets or a text editor are all accepted, whichever MIME type your browser reports for them; a UTF-8 byte order mark and Windows (CRLF) line endings are handled, and blank lines are skipped.
+
+After an import you'll see a summary of how many URLs were imported, and a table of up to 50 rows that need attention: URLs that were rejected (e.g. malformed, or already in the database), and requested short URLs that were changed or unavailable.
+
+Note: In this repository is a file called `test.csv`, which you can use as an example. Several of its rows are rejected or changed on purpose, to show what happens.
 
 
 ### No keywords
@@ -82,12 +86,12 @@ I have talked through some common plugins and the outcomes of various situations
 
 ### Titles
 
-Normally, YOURLS will try to get a title for you by downloading the web page from the supplied URL and checking the raw HTML for a title.  This is possibly the reason for slow bulk importing, when extremely large CSV files are uploaded.  This plugin prevents YOURLS from doing it's job and instead creates a title from the supplied URL, or uses the one in the third column of the CSV, if present and non-empty.
+Normally, YOURLS will try to get a title for you by downloading the web page from the supplied URL and checking the raw HTML for a title.  This is slow when importing large CSV files, so this plugin instead creates a title from the supplied URL, or uses the one in the third column of the CSV, if present and non-empty.
 
 
 ## Troubleshooting
 
-One user experienced timeout issues processing a CSV file containing ~60,000 rows. I've not investigated this issue thoroughly, but the 0.2 version contains a line that creates a title from the supplied URL instead of letting YOURLS CURLing the URL and extracting a title from the returned HTML.  I believe this to be faster, but I have only done a little testing.
+One user experienced timeout issues processing a CSV file containing ~60,000 rows. Since v0.2 the plugin creates a title from the supplied URL instead of letting YOURLS fetch the page to find one, and since v0.5 it skips YOURLS's per-link flood check during an import (you're already logged in). As a guide, 10,000 rows import in under 30 seconds on a default YOURLS 1.10 Docker install.
 
 Some ideas, if processing a large CSV file:
 
@@ -121,6 +125,7 @@ I'm always keen to add new features, improve performance and squash bugs, so if 
 
 ## History
 
+* **2026-10-11, v0.5:**     Updated for YOURLS 1.10.x and PHP 8.1+. Accept CSV files whatever MIME type the browser sends (fixes uploads from Windows / Excel), checking the extension and contents instead. Report rows which were not imported or whose short URL was changed. Handle byte order marks, long lines and blank lines. Stop large imports failing due to YOURLS's flood check. Escape output and make strings translatable.
 * **2020-07-31, v0.4:**     No meaningful code changes, but added a small Bash (Linux) script to make a large single-column CSV file for testing. You should be able to run it within Bash with `./create-large-csv.sh`. You might have to `chmod +x create-large-csv.sh` first.
 * **2020-07-25, v0.3:**     Going through the issues on GitHub and saw #3 which looked like an easy addition, so now if a third, optional field is specified in the URL, that is used as a title.
 * **2020-07-25, v0.2:**     From a bug report via email about it running slowly processing thousands of rows, I've attempted a 'fix' by creating a title from the URL and passing that to the YOURLS function that would otherwise attempt to fetch one from the URL's HTML.
