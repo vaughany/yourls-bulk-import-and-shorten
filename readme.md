@@ -37,6 +37,8 @@ This plugin expects you to upload a CSV file with at least one column and option
 
 The file must have a `.csv` extension. Files saved by Excel, LibreOffice, Google Sheets or a text editor are all accepted, whichever MIME type your browser reports for them; a UTF-8 byte order mark and Windows (CRLF) line endings are handled, and blank lines are skipped.
 
+If the upload itself fails (for example, file uploads are disabled on the server, or the file is larger than PHP allows) the plugin tells you why.
+
 After an import you'll see a summary of how many URLs were imported, and a table of up to 50 rows that need attention: URLs that were rejected (e.g. malformed, or already in the database), and requested short URLs that were changed or unavailable.
 
 Note: In this repository is a file called `test.csv`, which you can use as an example. Several of its rows are rejected or changed on purpose, to show what happens.
@@ -97,6 +99,7 @@ Some ideas, if processing a large CSV file:
 
 * Increase the `max_execution_time` setting in your `php.ini` file from it's default of 30 seconds.
 * Increase the `max_input_time` setting in your `php.ini` file from it's default of 60 seconds.
+* If the plugin says the file is larger than the server allows, increase `upload_max_filesize` and `post_max_size` in your `php.ini` file (the defaults are 2MB and 8MB).
 
 **Note:** Setting either of these to 300 / 600 / 900 seconds (5 / 10 / 15 minutes) is not unreasonable.
 
@@ -125,7 +128,7 @@ I'm always keen to add new features, improve performance and squash bugs, so if 
 
 ## History
 
-* **2026-10-11, v0.5:**     Updated for YOURLS 1.10.x and PHP 8.1+. Accept CSV files whatever MIME type the browser sends (fixes uploads from Windows / Excel), checking the extension and contents instead. Report rows which were not imported or whose short URL was changed. Handle byte order marks, long lines and blank lines. Stop large imports failing due to YOURLS's flood check. Escape output and make strings translatable.
+* **2026-10-11, v0.5:**     Updated for YOURLS 1.10.x and PHP 8.1+. Accept CSV files whatever MIME type the browser sends (fixes uploads from Windows / Excel), checking the extension and contents instead. Report rows which were not imported or whose short URL was changed. Handle byte order marks, long lines and blank lines. Stop large imports failing due to YOURLS's flood check. Escape output and make strings translatable. Clear error messages when an upload fails (file uploads disabled, file larger than `upload_max_filesize` or `post_max_size`, other PHP upload errors) and several of the fixes above were contributed by [Peter Gerstbach](https://github.com/pgerstbach) in [#17](https://github.com/vaughany/yourls-bulk-import-and-shorten/pull/17) - thank you!
 * **2020-07-31, v0.4:**     No meaningful code changes, but added a small Bash (Linux) script to make a large single-column CSV file for testing. You should be able to run it within Bash with `./create-large-csv.sh`. You might have to `chmod +x create-large-csv.sh` first.
 * **2020-07-25, v0.3:**     Going through the issues on GitHub and saw #3 which looked like an easy addition, so now if a third, optional field is specified in the URL, that is used as a title.
 * **2020-07-25, v0.2:**     From a bug report via email about it running slowly processing thousands of rows, I've attempted a 'fix' by creating a title from the URL and passing that to the YOURLS function that would otherwise attempt to fetch one from the URL's HTML.
